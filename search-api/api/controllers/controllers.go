@@ -1,14 +1,22 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"go-elasticsearch-example/search-api/api/models"
 	"go-elasticsearch-example/search-api/api/repositorys"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/teris-io/shortid"
+)
+
+var (
+	page *models.PageSearch
+	err  error
 )
 
 func CreateDocumentsEndpoint(c *gin.Context) {
@@ -33,51 +41,45 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-/*
-func searchEndpoint(c *gin.Context) {
-	// Parse request
+func SearchEndpoint(c *gin.Context) {
 	query := c.Query("query")
 	if query == "" {
 		errorResponse(c, http.StatusBadRequest, "Query not specified")
 		return
 	}
-	skip := 0
-	take := 10
+
+	page := models.PageSearch{Skip: 0, Take: 10}
+
 	if i, err := strconv.Atoi(c.Query("skip")); err == nil {
-		skip = i
+		page.Skip = i
 	}
 	if i, err := strconv.Atoi(c.Query("take")); err == nil {
-		take = i
+		page.Skip = i
 	}
-	// Perform search
-	esQuery := elastic.NewMultiMatchQuery(query, "title", "content").
-		Fuzziness("2").
-		MinimumShouldMatch("2")
-	result, err := elasticClient.Search().
-		Index(elasticIndexName).
-		Query(esQuery).
-		From(skip).Size(take).
-		Do(c.Request.Context())
+
+	result, err := repositorys.SearchDocument(query, &page)
+
 	if err != nil {
 		log.Println(err)
 		errorResponse(c, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
-	res := models.SearchResponse{
+
+	res := models.AnimeSearchResponse{
 		Time: fmt.Sprintf("%d", result.TookInMillis),
 		Hits: fmt.Sprintf("%d", result.Hits.TotalHits),
 	}
-	// Transform search results before returning them
-	docs := make([]models.DocumentResponse, 0)
+
+	docs := make([]models.AnimeDocumentResponse, 0)
 	for _, hit := range result.Hits.Hits {
-		var doc models.DocumentResponse
+		var doc models.AnimeDocumentResponse
 		json.Unmarshal(*hit.Source, &doc)
 		docs = append(docs, doc)
 	}
 	res.Documents = docs
 	c.JSON(http.StatusOK, res)
 }
-*/
+
 func errorResponse(c *gin.Context, code int, err string) {
 	c.JSON(code, gin.H{
 		"error": err,

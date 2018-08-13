@@ -24,6 +24,6 @@ func main() {
 
 func configRoutes(r *gin.Engine) {
 	r.Use(middleware.Site())
-	r.POST("/documents", controllers.CreateDocumentsEndpoint)
-	//	r.GET("/search", searchEndpoint)
+	r.POST("/document", controllers.CreateDocumentsEndpoint)
+	r.GET("/search", controllers.SearchEndpoint)
 }

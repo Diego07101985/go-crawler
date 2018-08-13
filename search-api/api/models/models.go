@@ -2,6 +2,11 @@ package models
 
 import "time"
 
+type PageSearch struct {
+	Skip int
+	Take int
+}
+
 // AnimeDocumentRequest is a representation of a anime request
 type AnimeDocumentRequest struct {
 	Title   string `json:"title"`

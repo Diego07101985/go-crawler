@@ -10,6 +10,7 @@ import (
 func Site() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		repositorys.InitElastic(infra.ConfigInitElasticSearchClient())
+		repositorys.SetGinContext(c)
 		c.Next()
 	}
 }

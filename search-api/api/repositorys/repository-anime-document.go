@@ -1,6 +1,7 @@
 package repositorys
 
 import (
+	"go-elasticsearch-example/search-api/api/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,11 +28,24 @@ var (
 	context       *gin.Context
 )
 
-/*
-func (d m.AnimeDocument) GetAnimeDocument() m.AnimeDocument {
-
+func SetGinContext(c *gin.Context) {
+	context = c
 }
 
+func SearchDocument(query string, page *models.PageSearch) (*elastic.SearchResult, error) {
+	esQuery := elastic.NewMultiMatchQuery(query, "title", "content").
+		Fuzziness("2").
+		MinimumShouldMatch("2")
+	result, err := elasticClient.Search().
+		Index(elasticIndexName).
+		Query(esQuery).
+		From(page.Skip).Size(page.Take).
+		Do(context.Request.Context())
+
+	return result, err
+}
+
+/*
 func (d AnimeDocument) UpdateAnimeDocument() AnimeDocument {
 
 }
