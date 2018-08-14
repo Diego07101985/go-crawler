@@ -9,8 +9,9 @@ import (
 
 func Site() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		repositorys.InitElastic(infra.ConfigInitElasticSearchClient())
+		repositorys.NewElastic(infra.ConfigInitElasticSearchClient())
 		repositorys.SetGinContext(c)
+		repositorys.NewDb(infra.ConfigDBOrmGorm())
 		c.Next()
 	}
 }

@@ -31,7 +31,6 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 		CreatedAt: time.Now().UTC(),
 		Content:   doc.Content,
 	}
-
 	bulk := newDocumentAnime.CreateAnimeDocument()
 	if _, err := repositorys.Execute(c, bulk); err != nil {
 		log.Println(err)
@@ -47,7 +46,6 @@ func SearchEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Query not specified")
 		return
 	}
-
 	page := models.PageSearch{Skip: 0, Take: 10}
 
 	if i, err := strconv.Atoi(c.Query("skip")); err == nil {
@@ -56,7 +54,6 @@ func SearchEndpoint(c *gin.Context) {
 	if i, err := strconv.Atoi(c.Query("take")); err == nil {
 		page.Skip = i
 	}
-
 	result, err := repositorys.SearchDocument(query, &page)
 
 	if err != nil {
@@ -64,12 +61,10 @@ func SearchEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
-
 	res := models.AnimeSearchResponse{
 		Time: fmt.Sprintf("%d", result.TookInMillis),
 		Hits: fmt.Sprintf("%d", result.Hits.TotalHits),
 	}
-
 	docs := make([]models.AnimeDocumentResponse, 0)
 	for _, hit := range result.Hits.Hits {
 		var doc models.AnimeDocumentResponse
