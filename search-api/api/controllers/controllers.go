@@ -25,14 +25,14 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Malformed request body")
 		return
 	}
-	newDocumentAnime := repositorys.AnimeDocument{
+	newDocumentAnime := models.AnimeDocument{
 		ID:        shortid.MustGenerate(),
 		Title:     doc.Title,
 		CreatedAt: time.Now().UTC(),
 		Content:   doc.Content,
 	}
-	bulk := newDocumentAnime.CreateAnimeDocument()
-	if _, err := repositorys.Execute(c, bulk); err != nil {
+	bulk := elasticrepo.CreateAnimeDocument(newDocumentAnime)
+	if _, err := elasticrepo.Execute(c, bulk); err != nil {
 		log.Println(err)
 		errorResponse(c, http.StatusInternalServerError, "Failed to create documents")
 		return

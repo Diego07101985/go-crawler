@@ -1,7 +1,6 @@
 package infra
 
 import (
-	"go-elasticsearch-example/search-api/api/repositorys"
 	"log"
 	"time"
 
@@ -31,15 +30,4 @@ func ConfigInitElasticSearchClient() (error, *elastic.Client) {
 		}
 	}
 	return err, elasticClient
-}
-
-func ConfigDBOrmGorm() *gorm.DB {
-	db, err = gorm.Open("mysql", "root:33838449@tcp(127.0.0.1:3306)/localhost?charset=utf8&parseTime=True&loc=Local")
-
-	if err != nil {
-		log.Println(err)
-	}
-	defer db.Close()
-	db.AutoMigrate(&repositorys.AnimeDocument{})
-	return db
 }

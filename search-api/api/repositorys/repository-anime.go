@@ -1,45 +1,11 @@
-package repositorys
+package elasticrepo
 
 import (
 	"go-elasticsearch-example/search-api/api/models"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"github.com/olivere/elastic"
 )
-
-// AnimeDocument is a representation of a anime
-type AnimeDocument struct {
-	ID            string `json:"id"`
-	Title         string `json:"title"`
-	Slug          string
-	CreatedAt     time.Time `json:"created_at"`
-	Updated       string    `json:"updated_at"`
-	Content       string    `json:"content"`
-	TitleEnglish  string    `json:"title_english"`
-	TitleJapanese string    `json:"title_japanese"`
-	Aired         string    `json:"aired"`
-	Airing        string    `json:"airing"`
-	Background    string    `json:"background"`
-	Broadcast     string    `json:"broadcast"`
-	Duration      string    `json:"duration"`
-	Rank          string    `json:"rank"`
-	Episodes      string    `json:"episodes"`
-	Favorites     string    `json:"favorites"`
-	Image         string    `json:"image_url"`
-	Members       string    `json:"members"`
-	Popularity    string    `json:"popularity"`
-	Rating        string    `json:"rating"`
-	Score         string    `json:"score"`
-	Source        string    `json:"source"`
-	Status        string    `json:"status"`
-	ScoredBy      string    `json:"scored_by"`
-	Synopsis      string    `json:"synopsis"`
-	Type          string    `json:"type"`
-	Openings      string    `json:"opening_theme"`
-	Endings       string    `json:"ending_theme"`
-}
 
 const (
 	elasticIndexName = "documents"
@@ -51,12 +17,8 @@ var (
 	bulk          *elastic.BulkService
 	err           error
 	context       *gin.Context
-	database      *gorm.DB
 )
 
-func NewDb(db *gorm.DB) {
-	database = db
-}
 func SetGinContext(c *gin.Context) {
 	context = c
 }
@@ -80,13 +42,13 @@ func NewElastic(erro error, elastic *elastic.Client) {
 }
 
 // CreateAnimeDocument is a representation of func createAnime
-func (d AnimeDocument) CreateAnimeDocument() *elastic.BulkService {
+func CreateAnimeDocument(animeDocument models.AnimeDocument) *elastic.BulkService {
 	bulk := elasticClient.
 		Bulk().
 		Index(elasticIndexName).
 		Type(elasticTypeName)
 
-	bulk.Add(elastic.NewBulkIndexRequest().Id(d.ID).Doc(d))
+	bulk.Add(elastic.NewBulkIndexRequest().Id(animeDocument.ID).Doc(animeDocument))
 	return bulk
 }
 
