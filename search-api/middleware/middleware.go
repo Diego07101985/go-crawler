@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"go-elasticsearch-example/search-api/api/repositorys"
-	"go-elasticsearch-example/search-api/api/repositorys/repository-gorm"
-	"go-elasticsearch-example/search-api/infra"
-	"go-elasticsearch-example/search-api/infra/db"
+	"go-crawler/search-api/api/repositorys"
+	"go-crawler/search-api/api/repositorys/repository-gorm"
+	"go-crawler/search-api/infra"
+	"go-crawler/search-api/infra/db"
 
 	"github.com/gin-gonic/gin"
 )

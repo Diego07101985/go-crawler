@@ -55,17 +55,6 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:37ce7d7d80531b227023331002c0d42b4b4b291a96798c82a049d03a54ba79e4"
-  name = "github.com/lib/pq"
-  packages = [
-    ".",
-    "oid",
-  ]
-  pruneopts = "UT"
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
-
-[[projects]]
-  branch = "master"
   digest = "1:aa3d8d42865c42626b5c1add193692d045b3188b1479f0a0a88690d21fe20083"
   name = "github.com/mailru/easyjson"
   packages = [
@@ -148,7 +137,6 @@
   input-imports = [
     "github.com/gin-gonic/gin",
     "github.com/jinzhu/gorm",
-    "github.com/lib/pq",
     "github.com/olivere/elastic",
     "github.com/teris-io/shortid",
   ]

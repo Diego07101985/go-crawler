@@ -2,12 +2,11 @@ package db
 
 import (
 	"fmt"
-	"go-elasticsearch-example/search-api/api/models"
+	"go-crawler/search-api/api/models"
 	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
-	_ "github.com/lib/pq"
 )
 
 var db *gorm.DB

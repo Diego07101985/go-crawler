@@ -1,6 +1,6 @@
 FROM golang:1.10.0
 
-ENV SRC_DIR=/go/src/go-elasticsearch-example/search-api
+ENV SRC_DIR=/go/src/go-crawler/search-api
 ADD . $SRC_DIR
 RUN cd $SRC_DIR
 

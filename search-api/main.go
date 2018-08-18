@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-elasticsearch-example/search-api/api/controllers"
-	"go-elasticsearch-example/search-api/middleware"
+	"go-crawler/search-api/api/controllers"
+	"go-crawler/search-api/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -26,4 +26,5 @@ func configRoutes(r *gin.Engine) {
 	r.Use(middleware.Site())
 	r.POST("/document", controllers.CreateDocumentsEndpoint)
 	r.GET("/search", controllers.SearchEndpoint)
+	r.GET("/findAnimes/:id", controllers.FindAnimeEndPoint)
 }

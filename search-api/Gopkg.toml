@@ -34,10 +34,6 @@
   version = "1.9.1"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/lib/pq"
-
-[[constraint]]
   name = "github.com/olivere/elastic"
   version = "6.1.27"
 

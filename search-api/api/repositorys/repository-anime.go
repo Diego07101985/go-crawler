@@ -1,7 +1,7 @@
 package elasticrepo
 
 import (
-	"go-elasticsearch-example/search-api/api/models"
+	"go-crawler/search-api/api/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/olivere/elastic"

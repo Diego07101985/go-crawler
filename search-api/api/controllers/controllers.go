@@ -3,8 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"go-elasticsearch-example/search-api/api/models"
-	"go-elasticsearch-example/search-api/api/repositorys"
+	"go-crawler/search-api/api/models"
+	"go-crawler/search-api/api/repositorys"
+	"go-crawler/search-api/api/repositorys/repository-gorm"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,6 +41,12 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+func FindAnimeEndPoint(c *gin.Context) {
+	id := c.Param("id")
+	anime := ormsql.GetAnimeById(id)
+	c.JSON(200, anime)
+}
+
 func SearchEndpoint(c *gin.Context) {
 	query := c.Query("query")
 	if query == "" {
@@ -54,7 +61,7 @@ func SearchEndpoint(c *gin.Context) {
 	if i, err := strconv.Atoi(c.Query("take")); err == nil {
 		page.Skip = i
 	}
-	result, err := repositorys.SearchDocument(query, &page)
+	result, err := elasticrepo.SearchDocument(query, &page)
 
 	if err != nil {
 		log.Println(err)
