@@ -13,6 +13,7 @@ func Site() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		elasticrepo.NewElastic(infra.ConfigInitElasticSearchClient())
 		elasticrepo.SetGinContext(c)
+		db.Init()
 		ormsql.NewDb(db.GetDB())
 		c.Next()
 	}

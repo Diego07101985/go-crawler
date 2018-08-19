@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/lib/pq"
 )
 
 var db *gorm.DB
@@ -23,19 +25,15 @@ func getEnv(key, fallback string) string {
 // migrates any new models
 func Init() {
 	user := getEnv("DB_USER", "root")
-	password := getEnv("DB_PASSWORD", "33838449")
-	host := getEnv("DB_HOST", "localhost")
-	port := getEnv("DB_PORT", "3306")
-	database := getEnv("DB", "go_crawler")
+	password := getEnv("DB_PASSWORD", "root")
+	dbname := getEnv("DB_NAME", "go_crawler")
 
-	dbinfo := fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s sslmode=disable",
+	dbinfo := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s?charset=utf8&parseTime=True",
 		user,
 		password,
-		host,
-		port,
-		database,
+		dbname,
 	)
-
+	println(dbinfo)
 	db, err = gorm.Open("mysql", dbinfo)
 	if err != nil {
 		log.Println("Failed to connect to database")
@@ -49,7 +47,6 @@ func Init() {
 			log.Println("Table already exists")
 		}
 	}
-
 	db.AutoMigrate(&models.AnimeDocument{})
 }
 
