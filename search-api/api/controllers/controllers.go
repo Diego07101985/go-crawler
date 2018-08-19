@@ -50,6 +50,15 @@ func FindAnimeEndPoint(c *gin.Context) {
 	c.JSON(200, anime)
 }
 
+func CreateAnimeEndPoint(c *gin.Context) {
+
+	var anime models.AnimeDocument
+	if anime = ormsql.CreateAnime(anime); anime.ID != "" {
+		c.JSON(http.StatusCreated, &anime)
+	}
+	errorResponse(c, http.StatusConflict, "Multiplos animes encontrados")
+}
+
 func SearchEndpoint(c *gin.Context) {
 	query := c.Query("query")
 	if query == "" {

@@ -21,8 +21,11 @@ func GetAnimeById(ID string) models.AnimeDocument {
 	return animeInstance
 }
 
-func CreateAnime(anime models.AnimeDocument) {
-	db.Create(&anime)
+func CreateAnime(anime models.AnimeDocument) models.AnimeDocument {
+	if anime = GetAnimeById(anime.ID); anime.ID != "" {
+		db.Create(&anime)
+	}
+	return anime
 }
 
 func UpdateAnime(anime models.AnimeDocument, ID string) models.AnimeDocument {
