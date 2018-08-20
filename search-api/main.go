@@ -27,4 +27,5 @@ func configRoutes(r *gin.Engine) {
 	r.POST("/document", controllers.CreateDocumentsEndpoint)
 	r.GET("/search", controllers.SearchEndpoint)
 	r.GET("/findAnimes/:id", controllers.FindAnimeEndPoint)
+	r.POST("/createAnime", controllers.CreateAnimeEndPoint)
 }

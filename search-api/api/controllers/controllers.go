@@ -42,11 +42,11 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 }
 
 func FindAnimeEndPoint(c *gin.Context) {
-	id := c.Param("id")
+	//id := c.Param("id")
 	var anime models.AnimeDocument
-	if anime = ormsql.GetAnimeById(id); anime.ID == "" {
+	/*if anime = ormsql.GetAnimeById(id); anime.ID == "" {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
-	}
+	}*/
 	c.JSON(200, anime)
 }
 
