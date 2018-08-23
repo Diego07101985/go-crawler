@@ -8,8 +8,20 @@ services:
       - '8080:8080'
     depends_on:
       - elasticsearch
+      - mysql
+    links:
+      - mysql
   elasticsearch:
     container_name: 'elasticsearch'
     image: 'docker.elastic.co/elasticsearch/elasticsearch:6.2.3'
     ports:
       - '9200:9200'
+  mysql:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=go_crawler
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - "3357:3306"
+    volumes:
+    - ./mysql5.7/conf.d:/etc/mysql/conf.d
