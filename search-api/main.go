@@ -3,7 +3,7 @@ package main
 import (
 	"go-crawler/search-api/api/controllers"
 	"go-crawler/search-api/middleware"
-	"log"
+	"go-crawler/search-api/services/crawler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/olivere/elastic"
@@ -15,11 +15,12 @@ var (
 )
 
 func main() {
-	r := gin.Default()
-	configRoutes(r)
-	if err = r.Run(":8080"); err != nil {
-		log.Fatal(err)
-	}
+	/*	r := gin.Default()
+		configRoutes(r)
+		if err = r.Run(":8080"); err != nil {
+			log.Fatal(err)
+		}*/
+	crawler.CheckAnime()
 }
 
 func configRoutes(r *gin.Engine) {
