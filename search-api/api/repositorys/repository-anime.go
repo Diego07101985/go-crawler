@@ -2,6 +2,7 @@ package elasticrepo
 
 import (
 	"go-crawler/search-api/api/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/olivere/elastic"
@@ -48,7 +49,9 @@ func CreateAnimeDocument(animeDocument models.AnimeDocument) *elastic.BulkServic
 		Index(elasticIndexName).
 		Type(elasticTypeName)
 
-	bulk.Add(elastic.NewBulkIndexRequest().Id(animeDocument.ID).Doc(animeDocument))
+	id := strconv.FormatUint(animeDocument.ID, 64)
+
+	bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument))
 	return bulk
 }
 

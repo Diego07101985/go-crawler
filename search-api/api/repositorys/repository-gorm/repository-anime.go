@@ -16,19 +16,19 @@ func NewDb(database *gorm.DB) {
 	db = database
 }
 
-func GetAnimeById(ID string) models.AnimeDocument {
+func GetAnimeById(ID uint64) models.AnimeDocument {
 	db.Find(&animeInstance, ID)
 	return animeInstance
 }
 
-func CreateAnime(anime models.AnimeDocument) models.AnimeDocument {
-	if anime = GetAnimeById(anime.ID); anime.ID != "" {
+func CreateAnime(anime models.AnimeDocument) uint64 {
+	if anime = GetAnimeById(anime.ID); &anime != nil {
 		db.Create(&anime)
 	}
-	return anime
+	return anime.ID
 }
 
-func UpdateAnime(anime models.AnimeDocument, ID string) models.AnimeDocument {
+func UpdateAnime(anime models.AnimeDocument, ID uint64) models.AnimeDocument {
 
 	if animeOld := GetAnimeById(ID); &animeOld != nil {
 		return animeOld
@@ -37,7 +37,7 @@ func UpdateAnime(anime models.AnimeDocument, ID string) models.AnimeDocument {
 	return anime
 }
 
-func DeleteAnime(anime models.AnimeDocument, ID string) models.AnimeDocument {
+func DeleteAnime(anime models.AnimeDocument, ID uint64) models.AnimeDocument {
 	animeDeletar := GetAnimeById(ID)
 	if &animeDeletar == nil {
 		return animeDeletar

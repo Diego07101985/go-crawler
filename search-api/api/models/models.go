@@ -11,7 +11,7 @@ type PageSearch struct {
 
 // AnimeDocument is a representation of a anime
 type AnimeDocument struct {
-	ID            string `json:"id"`
+	ID            uint64 `json:"id"`
 	Title         string `json:"title"`
 	Slug          string
 	CreatedAt     time.Time `json:"created_at"`
