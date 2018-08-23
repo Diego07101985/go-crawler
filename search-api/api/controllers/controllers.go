@@ -16,8 +16,9 @@ import (
 )
 
 var (
-	page *models.PageSearch
-	err  error
+	page             *models.PageSearch
+	err              error
+	newDocumentAnime models.AnimeDocument
 )
 
 func CreateDocumentsEndpoint(c *gin.Context) {
@@ -26,12 +27,18 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Malformed request body")
 		return
 	}
-	newDocumentAnime := models.AnimeDocument{
-		ID:        shortid.MustGenerate(),
-		Title:     doc.Title,
-		CreatedAt: time.Now().UTC(),
-		Content:   doc.Content,
+
+	if intID, err := strconv.ParseUint(shortid.MustGenerate(), 10, 64); err != nil {
+		newDocumentAnime = models.AnimeDocument{
+			ID:        intID,
+			Title:     doc.Title,
+			CreatedAt: time.Now().UTC(),
+			Content:   doc.Content,
+		}
+	} else {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
+
 	bulk := elasticrepo.CreateAnimeDocument(newDocumentAnime)
 	if _, err := elasticrepo.Execute(c, bulk); err != nil {
 		log.Println(err)
@@ -42,21 +49,33 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 }
 
 func FindAnimeEndPoint(c *gin.Context) {
-	//id := c.Param("id")
+	id := c.Param("id")
+	println(id)
 	var anime models.AnimeDocument
-	/*if anime = ormsql.GetAnimeById(id); anime.ID == "" {
+	uid, err := strconv.ParseUint(id, 10, 64)
+	println(id)
+	if err == nil {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
+	}
+	if anime = ormsql.GetAnimeById(uid); &anime != nil {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
-	}*/
-	c.JSON(200, anime)
+	}
+	c.JSON(200, &anime)
 }
 
 func CreateAnimeEndPoint(c *gin.Context) {
-
 	var anime models.AnimeDocument
-	if anime = ormsql.CreateAnime(anime); anime.ID != "" {
-		c.JSON(http.StatusCreated, &anime)
+	if err := c.BindJSON(&anime); err != nil {
+		errorResponse(c, http.StatusBadRequest, "Malformed request body")
+		return
 	}
-	errorResponse(c, http.StatusConflict, "Multiplos animes encontrados")
+
+	if anime.ID != 0 {
+		errorResponse(c, http.StatusConflict, "O anime ja existe")
+	}
+
+	id := ormsql.CreateAnime(anime)
+	c.JSON(http.StatusCreated, id)
 }
 
 func SearchEndpoint(c *gin.Context) {
