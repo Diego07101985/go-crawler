@@ -1,6 +1,8 @@
 package models
 
 import (
+	"container/list"
+	"fmt"
 	"time"
 )
 
@@ -39,6 +41,21 @@ type AnimeDocument struct {
 	Type          string    `json:"type"`
 	Openings      string    `json:"opening_theme"`
 	Endings       string    `json:"ending_theme"`
+}
+
+type AnimeDocumentsList struct {
+	List *list.List
+}
+
+func (e *AnimeDocumentsList) AddToList(anime *AnimeDocument) {
+	e.List.PushBack(anime)
+}
+
+func (e *AnimeDocumentsList) PrintAllList() {
+	for c := e.List.Front(); c != nil; c = c.Next() {
+		fmt.Print(c.Value.(*AnimeDocument).ID)
+		fmt.Print(c.Value.(*AnimeDocument).Title)
+	}
 }
 
 // AnimeDocumentRequest is a representation of a anime request
