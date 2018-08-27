@@ -57,7 +57,7 @@ func FindAnimeEndPoint(c *gin.Context) {
 	if err == nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
-	if anime = ormsql.GetAnimeById(uid); &anime != nil {
+	if anime := ormsql.GetAnimeById(uid); &anime != nil {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
 	}
 	c.JSON(200, &anime)

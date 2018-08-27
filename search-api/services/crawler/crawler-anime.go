@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/search-api/api/models"
+	"go-crawler/search-api/api/repositorys/repository-gorm"
+	"go-crawler/search-api/infra/db"
 	"net/http"
 	"strconv"
 	"sync"
@@ -28,35 +30,42 @@ func GetAnimeInApiExtern(link string, animeChan chan models.AnimeDocument) error
 	defer r.Body.Close()
 
 	err = json.NewDecoder(r.Body).Decode(&anime)
+	animeChan <- anime
 
 	if err != nil {
-		fmt.Println("Não foi possivel criar o objeto")
-
+		return err
 	}
-	animeChan <- anime
+
 	return err
 }
 
 func CheckAnime() {
-	channelAnimes := make(chan models.AnimeDocument, 20)
 
-	for i := 0; i < 20; i++ {
+	db.Init()
+	ormsql.NewDb(db.GetDB())
+
+	channelAnimes := make(chan models.AnimeDocument)
+
+	for i := 0; i < 3000; i++ {
 		wg.Add(1)
-		go func() {
+		go func(i int) {
 			defer wg.Done()
 			err := GetAnimeInApiExtern(BASE_URL+strconv.Itoa(i), channelAnimes)
 			if err != nil {
 				fmt.Println("Erro")
 			}
-		}()
+		}(i)
 	}
 
-	wg.Add(1)
-	go func() {
-		for i := range channelAnimes {
-			///Criar Persistencia no elastic Search e no Mysql
-		}
-	}()
-
+	for anime := range channelAnimes {
+		wg.Add(1)
+		fmt.Println(anime.Title)
+		fmt.Println(anime.TitleJapanese)
+		go func(animeDocument models.AnimeDocument) {
+			//	if animeDocument.Title != "" {
+			ormsql.CreateAnime(animeDocument)
+			//	}
+		}(anime)
+	}
 	wg.Wait()
 }
