@@ -12,8 +12,11 @@ import (
 )
 
 var (
-	anime models.AnimeDocument
-	wg    sync.WaitGroup
+	anime         models.AnimeDocument
+	wg            sync.WaitGroup
+	slot          = make(chan struct{}, 100)
+	channelAnimes = make(chan models.AnimeDocument)
+	err           error
 )
 
 var BASE_URL string = "https://api.jikan.moe/anime/"
@@ -44,13 +47,12 @@ func CheckAnime() {
 	db.Init()
 	ormsql.NewDb(db.GetDB())
 
-	channelAnimes := make(chan models.AnimeDocument)
-
-	for i := 0; i < 3000; i++ {
+	for i := 0; i < 20000; i++ {
 		wg.Add(1)
 		go func(i int) {
+			println(i)
 			defer wg.Done()
-			err := GetAnimeInApiExtern(BASE_URL+strconv.Itoa(i), channelAnimes)
+			spliceSlotsConcurrency(i, slot)
 			if err != nil {
 				fmt.Println("Erro")
 			}
@@ -62,10 +64,20 @@ func CheckAnime() {
 		fmt.Println(anime.Title)
 		fmt.Println(anime.TitleJapanese)
 		go func(animeDocument models.AnimeDocument) {
-			//	if animeDocument.Title != "" {
-			ormsql.CreateAnime(animeDocument)
-			//	}
+			if animeDocument.Title != "" {
+				ormsql.CreateAnime(animeDocument)
+			}
 		}(anime)
 	}
 	wg.Wait()
+}
+
+func spliceSlotsConcurrency(numberAnime int, slot chan struct{}) error {
+	slot <- struct{}{}
+	go func() {
+		defer func() { <-slot }()
+		fmt.Println(numberAnime)
+		err = GetAnimeInApiExtern(BASE_URL+strconv.Itoa(numberAnime), channelAnimes)
+	}()
+	return err
 }
