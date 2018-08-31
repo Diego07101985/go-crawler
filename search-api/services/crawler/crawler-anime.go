@@ -23,46 +23,36 @@ var BASE_URL string = "https://api.jikan.moe/anime/"
 
 func GetAnimeInApiExtern(link string, animeChan chan models.AnimeDocument) error {
 	r, err := http.Get(link)
-
 	anime := models.AnimeDocument{}
 
 	if err != nil {
-		fmt.Println(link, "might be down")
 		return err
 	}
 	defer r.Body.Close()
-
 	err = json.NewDecoder(r.Body).Decode(&anime)
 	animeChan <- anime
-
 	if err != nil {
 		return err
 	}
-
 	return err
 }
 
-func CheckAnime() {
-
+func Consumes(numberRequest int) {
 	db.Init()
 	ormsql.NewDb(db.GetDB())
 
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < numberRequest; i++ {
 		wg.Add(1)
 		go func(i int) {
-			println(i)
 			defer wg.Done()
-			spliceSlotsConcurrency(i, slot)
+			createSlotsConcurrencyForAnimes(i, slot)
 			if err != nil {
 				fmt.Println("Erro")
 			}
 		}(i)
 	}
-
 	for anime := range channelAnimes {
 		wg.Add(1)
-		fmt.Println(anime.Title)
-		fmt.Println(anime.TitleJapanese)
 		go func(animeDocument models.AnimeDocument) {
 			if animeDocument.Title != "" {
 				ormsql.CreateAnime(animeDocument)
@@ -72,7 +62,7 @@ func CheckAnime() {
 	wg.Wait()
 }
 
-func spliceSlotsConcurrency(numberAnime int, slot chan struct{}) error {
+func createSlotsConcurrencyForAnimes(numberAnime int, slot chan struct{}) error {
 	slot <- struct{}{}
 	go func() {
 		defer func() { <-slot }()

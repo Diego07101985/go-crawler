@@ -22,16 +22,13 @@ func GetAnimeById(ID uint64) models.AnimeDocument {
 }
 
 func CreateAnime(anime models.AnimeDocument) uint64 {
-	db.Create(&anime)
-
-	/*	if anime = GetAnimeById(anime.ID); &anime != nil {
+	if anime = GetAnimeById(anime.ID); &anime != nil {
 		db.Create(&anime)
-	}*/
+	}
 	return anime.ID
 }
 
 func UpdateAnime(anime models.AnimeDocument, ID uint64) models.AnimeDocument {
-
 	if animeOld := GetAnimeById(ID); &animeOld != nil {
 		return animeOld
 	}
