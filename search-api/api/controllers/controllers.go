@@ -21,6 +21,10 @@ var (
 	newDocumentAnime models.AnimeDocument
 )
 
+func ExecuteCrawlerEndpoint(c *gin.Context) {
+
+}
+
 func CreateDocumentsEndpoint(c *gin.Context) {
 	var doc models.AnimeDocumentRequest
 	if err := c.BindJSON(&doc); err != nil {
@@ -39,8 +43,7 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
 
-	bulk := elasticrepo.CreateAnimeDocument(newDocumentAnime)
-	if _, err := elasticrepo.Execute(c, bulk); err != nil {
+	if _, err := elasticrepo.CreateAnimeDocument(newDocumentAnime); err != nil {
 		log.Println(err)
 		errorResponse(c, http.StatusInternalServerError, "Failed to create documents")
 		return
@@ -50,10 +53,8 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 
 func FindAnimeEndPoint(c *gin.Context) {
 	id := c.Param("id")
-	println(id)
 	var anime models.AnimeDocument
 	uid, err := strconv.ParseUint(id, 10, 64)
-	println(id)
 	if err == nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}

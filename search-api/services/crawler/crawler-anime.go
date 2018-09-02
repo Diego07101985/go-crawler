@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"go-crawler/search-api/api/models"
+	"go-crawler/search-api/api/repositorys"
 	"go-crawler/search-api/api/repositorys/repository-gorm"
 	"go-crawler/search-api/infra/db"
 	"net/http"
 	"strconv"
 	"sync"
+
+	"github.com/olivere/elastic"
 )
 
 var (
@@ -17,11 +20,12 @@ var (
 	slot          = make(chan struct{}, 100)
 	channelAnimes = make(chan models.AnimeDocument)
 	err           error
+	bulkresponse  *elastic.BulkResponse
 )
 
 var BASE_URL string = "https://api.jikan.moe/anime/"
 
-func GetAnimeInApiExtern(link string, animeChan chan models.AnimeDocument) error {
+func getAnimeInApiExtern(link string, animeChan chan models.AnimeDocument) error {
 	r, err := http.Get(link)
 	anime := models.AnimeDocument{}
 
@@ -37,7 +41,7 @@ func GetAnimeInApiExtern(link string, animeChan chan models.AnimeDocument) error
 	return err
 }
 
-func Consumes(numberRequest int) {
+func ConsumeAnimes(numberRequest int) {
 	db.Init()
 	ormsql.NewDb(db.GetDB())
 
@@ -56,6 +60,9 @@ func Consumes(numberRequest int) {
 		go func(animeDocument models.AnimeDocument) {
 			if animeDocument.Title != "" {
 				ormsql.CreateAnime(animeDocument)
+				if _, err := elasticrepo.CreateAnimeDocument(animeDocument); err != nil {
+					fmt.Println("Method - ConsumeAnimesErro ao cadastrar anime no Elastic Search ")
+				}
 			}
 		}(anime)
 	}
@@ -67,7 +74,7 @@ func createSlotsConcurrencyForAnimes(numberAnime int, slot chan struct{}) error 
 	go func() {
 		defer func() { <-slot }()
 		fmt.Println(numberAnime)
-		err = GetAnimeInApiExtern(BASE_URL+strconv.Itoa(numberAnime), channelAnimes)
+		err = getAnimeInApiExtern(BASE_URL+strconv.Itoa(numberAnime), channelAnimes)
 	}()
 	return err
 }

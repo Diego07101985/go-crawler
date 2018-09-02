@@ -43,7 +43,7 @@ func NewElastic(erro error, elastic *elastic.Client) {
 }
 
 // CreateAnimeDocument is a representation of func createAnime
-func CreateAnimeDocument(animeDocument models.AnimeDocument) *elastic.BulkService {
+func CreateAnimeDocument(animeDocument models.AnimeDocument) (*elastic.BulkResponse, error) {
 	bulk := elasticClient.
 		Bulk().
 		Index(elasticIndexName).
@@ -52,10 +52,11 @@ func CreateAnimeDocument(animeDocument models.AnimeDocument) *elastic.BulkServic
 	id := strconv.FormatUint(animeDocument.ID, 64)
 
 	bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument))
-	return bulk
+	bulkresponse, err := execute(context, bulk)
+	return bulkresponse, err
 }
 
-func Execute(context *gin.Context, b *elastic.BulkService) (*elastic.BulkResponse, error) {
+func execute(context *gin.Context, b *elastic.BulkService) (*elastic.BulkResponse, error) {
 	bulkresponse, err := b.Do(context.Request.Context())
 	return bulkresponse, err
 }
