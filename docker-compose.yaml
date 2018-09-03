@@ -1,4 +1,4 @@
-leversion: '3.5'
+version: '3.5'
 services:
   search_api:
     container_name: 'search_api'

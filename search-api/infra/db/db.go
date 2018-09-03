@@ -25,11 +25,11 @@ func getEnv(key, fallback string) string {
 // migrates any new models
 func Init() {
 	user := getEnv("DB_USER", "root")
-	password := getEnv("DB_PASSWORD", "33838449")
+	password := getEnv("DB_PASSWORD", "root")
 	dbname := getEnv("DB_NAME", "go_crawler")
 
 	//dbinfo := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s?charset=utf8&parseTime=True",
-	dbinfo := fmt.Sprintf("%s:%s@tcp(localhost:3306)/%s?charset=utf8mb4&parseTime=True",
+	dbinfo := fmt.Sprintf("%s:%s@tcp(mysql:3306)/%s?charset=utf8mb4&parseTime=True",
 		user,
 		password,
 		dbname,
