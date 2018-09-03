@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"go-crawler/search-api/api/models"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
 	"log"
 	"os"
 
@@ -42,21 +42,18 @@ func Init() {
 	}
 	log.Println("Database connected")
 
-	if !db.HasTable(&models.AnimeDocument{}) {
-		err := db.CreateTable(&models.AnimeDocument{})
+	if !db.HasTable(&repository.AnimeDocument{}) {
+		err := db.CreateTable(&repository.AnimeDocument{})
 		if err != nil {
 			log.Println("Table already exists")
+			db.DropTable(&repository.AnimeDocument{})
 		}
 	}
-	db.AutoMigrate(&models.AnimeDocument{})
+	db.AutoMigrate(&repository.AnimeDocument{})
 	db.DB().SetMaxIdleConns(22)
 }
 
 //GetDB ...
 func GetDB() *gorm.DB {
 	return db
-}
-
-func CloseDB() {
-	db.Close()
 }

@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"go-crawler/search-api/api/models"
 	"go-crawler/search-api/api/repositorys"
-	"go-crawler/search-api/api/repositorys/repository-gorm"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
+	"go-crawler/search-api/services/crawler"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,24 +17,33 @@ import (
 )
 
 var (
-	page             *models.PageSearch
+	page             *elasticrepo.PageSearch
 	err              error
-	newDocumentAnime models.AnimeDocument
+	newDocumentAnime repository.AnimeDocument
+	animeFound       repository.AnimeDocument
+	anime            repository.AnimeDocument = repository.AnimeDocument{}
+	doc              models.AnimeDocumentRequest
 )
 
 func ExecuteCrawlerEndpoint(c *gin.Context) {
-
+	animesPersist := crawler.ConsumeAnimes(100)
+	if animesPersist > 0 {
+		c.JSON(http.StatusCreated, animesPersist)
+	}
 }
 
 func CreateDocumentsEndpoint(c *gin.Context) {
 	var doc models.AnimeDocumentRequest
+
 	if err := c.BindJSON(&doc); err != nil {
 		errorResponse(c, http.StatusBadRequest, "Malformed request body")
 		return
 	}
 
 	if intID, err := strconv.ParseUint(shortid.MustGenerate(), 10, 64); err != nil {
-		newDocumentAnime = models.AnimeDocument{
+		var doc models.AnimeDocumentRequest
+
+		newDocumentAnime = repository.AnimeDocument{
 			ID:        intID,
 			Title:     doc.Title,
 			CreatedAt: time.Now().UTC(),
@@ -53,19 +63,18 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 
 func FindAnimeEndPoint(c *gin.Context) {
 	id := c.Param("id")
-	var anime models.AnimeDocument
 	uid, err := strconv.ParseUint(id, 10, 64)
 	if err == nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
-	if anime := ormsql.GetAnimeById(uid); &anime != nil {
+
+	if animeFound := anime.GetAnimeById(uid); &animeFound != nil {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
 	}
-	c.JSON(200, &anime)
+	c.JSON(200, &animeFound)
 }
 
 func CreateAnimeEndPoint(c *gin.Context) {
-	var anime models.AnimeDocument
 	if err := c.BindJSON(&anime); err != nil {
 		errorResponse(c, http.StatusBadRequest, "Malformed request body")
 		return
@@ -75,7 +84,7 @@ func CreateAnimeEndPoint(c *gin.Context) {
 		errorResponse(c, http.StatusConflict, "O anime ja existe")
 	}
 
-	id := ormsql.CreateAnime(anime)
+	id := anime.CreateAnime()
 	c.JSON(http.StatusCreated, id)
 }
 
@@ -85,7 +94,7 @@ func SearchEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Query not specified")
 		return
 	}
-	page := models.PageSearch{Skip: 0, Take: 10}
+	page := elasticrepo.PageSearch{Skip: 0, Take: 10}
 
 	if i, err := strconv.Atoi(c.Query("skip")); err == nil {
 		page.Skip = i

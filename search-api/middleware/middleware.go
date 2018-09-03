@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"go-crawler/search-api/api/repositorys"
-	"go-crawler/search-api/api/repositorys/repository-gorm"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
 	"go-crawler/search-api/infra"
 	"go-crawler/search-api/infra/db"
 
@@ -14,7 +14,7 @@ func Site() gin.HandlerFunc {
 		elasticrepo.NewElastic(infra.ConfigInitElasticSearchClient())
 		elasticrepo.SetGinContext(c)
 		db.Init()
-		ormsql.NewDb(db.GetDB())
+		repository.NewDb(db.GetDB())
 		c.Next()
 	}
 }

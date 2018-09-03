@@ -1,7 +1,7 @@
 package elasticrepo
 
 import (
-	"go-crawler/search-api/api/models"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -20,11 +20,16 @@ var (
 	context       *gin.Context
 )
 
+type PageSearch struct {
+	Skip int
+	Take int
+}
+
 func SetGinContext(c *gin.Context) {
 	context = c
 }
 
-func SearchDocument(query string, page *models.PageSearch) (*elastic.SearchResult, error) {
+func SearchDocument(query string, page *PageSearch) (*elastic.SearchResult, error) {
 	esQuery := elastic.NewMultiMatchQuery(query, "title", "content").
 		Fuzziness("2").
 		MinimumShouldMatch("2")
@@ -43,7 +48,7 @@ func NewElastic(erro error, elastic *elastic.Client) {
 }
 
 // CreateAnimeDocument is a representation of func createAnime
-func CreateAnimeDocument(animeDocument models.AnimeDocument) (*elastic.BulkResponse, error) {
+func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkResponse, error) {
 	bulk := elasticClient.
 		Bulk().
 		Index(elasticIndexName).
