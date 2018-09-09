@@ -20,7 +20,6 @@ var (
 	page             *elasticrepo.PageSearch
 	err              error
 	newDocumentAnime repository.AnimeDocument
-	animeFound       repository.AnimeDocument
 	anime            repository.AnimeDocument = repository.AnimeDocument{}
 	doc              models.AnimeDocumentRequest
 )
@@ -62,13 +61,17 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 }
 
 func FindAnimeEndPoint(c *gin.Context) {
+	fmt.Println("FindAnimeEndPoint")
+	var animeFound = repository.AnimeDocument{}
+
 	id := c.Param("id")
 	uid, err := strconv.ParseUint(id, 10, 64)
-	if err == nil {
+	fmt.Println(uid)
+	if err != nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
 
-	if animeFound := anime.GetAnimeById(uid); &animeFound != nil {
+	if animeFound = anime.GetAnimeById(uid); animeFound.Title == "" {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
 	}
 	c.JSON(200, &animeFound)

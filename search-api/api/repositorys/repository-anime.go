@@ -1,6 +1,7 @@
 package elasticrepo
 
 import (
+	"fmt"
 	repository "go-crawler/search-api/api/repositorys/repository-gorm"
 	"strconv"
 
@@ -49,13 +50,14 @@ func NewElastic(erro error, elastic *elastic.Client) {
 
 // CreateAnimeDocument is a representation of func createAnime
 func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkResponse, error) {
+	fmt.Println("CreateAnimeDocument")
 	bulk := elasticClient.
 		Bulk().
 		Index(elasticIndexName).
 		Type(elasticTypeName)
 
-	id := strconv.FormatUint(animeDocument.ID, 64)
-
+	id := strconv.FormatUint(animeDocument.ID, 16)
+	fmt.Println(id)
 	bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument))
 	bulkresponse, err := execute(context, bulk)
 	return bulkresponse, err
