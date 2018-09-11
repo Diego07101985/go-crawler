@@ -71,11 +71,10 @@ func (d AnimeDocument) UpdateAnime(ID uint64) error {
 func (d AnimeDocument) DeleteAnime(ID uint64) error {
 	var animeDeletar = AnimeDocument{}
 	if animeDeletar = d.GetAnimeById(ID); &animeDeletar == nil {
-		return errors.New("Não existe o anime selecionado")
+		return errors.New("Não foi possivel encontrar o anime")
 	}
-	db.Delete(animeDeletar)
+	db.Delete(&animeDeletar)
 	return err
-
 }
 
 func Count() int {

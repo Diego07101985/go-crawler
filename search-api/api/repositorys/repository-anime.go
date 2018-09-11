@@ -48,6 +48,17 @@ func NewElastic(erro error, elastic *elastic.Client) {
 	err, elasticClient = erro, elastic
 }
 
+func DeleteAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.DeleteResponse, error) {
+	fmt.Println("CreateAnimeDocument")
+	bulk := elasticClient.Delete().
+		Index(elasticIndexName).
+		Type(elasticTypeName)
+
+	id := strconv.FormatUint(animeDocument.ID, 16)
+	deleteResponse, err := bulk.Id(id).Do(context.Request.Context())
+	return deleteResponse, err
+}
+
 // CreateAnimeDocument is a representation of func createAnime
 func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkResponse, error) {
 	fmt.Println("CreateAnimeDocument")

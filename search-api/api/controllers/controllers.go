@@ -35,20 +35,29 @@ func UpdateAnimeEndpoint(c *gin.Context) {
 	var animeFound = repository.AnimeDocument{}
 	id := c.Param("id")
 	uid, err := strconv.ParseUint(id, 10, 64)
-
 	if err != nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
-
 	if err := animeFound.UpdateAnime(uid); err != nil {
-		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
+		errorResponse(c, http.StatusNoContent, err.Error())
 	}
-
 	c.JSON(200, animeFound)
 }
 
 func DeleteAnimeEndpoint(c *gin.Context) {
-
+	var animeFound = repository.AnimeDocument{}
+	id := c.Param("id")
+	uid, err := strconv.ParseUint(id, 10, 64)
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
+	}
+	if err := animeFound.DeleteAnime(uid); err != nil {
+		errorResponse(c, http.StatusNoContent, err.Error())
+	}
+	if _, err := elasticrepo.DeleteAnimeDocument(animeFound); err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Não foi possivel deletar anime no elasticsearch")
+	}
+	c.JSON(200, animeFound)
 }
 func CreateDocumentsEndpoint(c *gin.Context) {
 	var doc models.AnimeDocumentRequest

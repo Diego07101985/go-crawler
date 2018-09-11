@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/olivere/elastic"
 )
@@ -57,6 +58,7 @@ func ConsumeAnimes(numberRequest int) int {
 		wg.Add(1)
 		go func(animeDocument repository.AnimeDocument) {
 			if animeDocument.Title != "" {
+				animeDocument.CreatedAt = time.Now()
 				animeDocument.ID = animeDocument.CreateAnime()
 				if _, err := elasticrepo.CreateAnimeDocument(animeDocument); err != nil {
 					fmt.Println("Method - ConsumeAnimesErro ao cadastrar anime no Elastic Search ")
