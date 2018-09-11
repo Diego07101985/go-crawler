@@ -57,13 +57,6 @@ func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkR
 		Type(elasticTypeName)
 
 	id := strconv.FormatUint(animeDocument.ID, 16)
-	fmt.Println(id)
-	bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument))
-	bulkresponse, err := execute(context, bulk)
-	return bulkresponse, err
-}
-
-func execute(context *gin.Context, b *elastic.BulkService) (*elastic.BulkResponse, error) {
-	bulkresponse, err := b.Do(context.Request.Context())
+	bulkresponse, err := bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument)).Do(context.Request.Context())
 	return bulkresponse, err
 }
