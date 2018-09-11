@@ -24,9 +24,11 @@ func main() {
 
 func configRoutes(r *gin.Engine) {
 	r.Use(middleware.Site())
-	r.POST("/document", controllers.CreateDocumentsEndpoint)
+	r.POST("/animes/elastic", controllers.CreateDocumentsEndpoint)
 	r.GET("/search", controllers.SearchEndpoint)
-	r.GET("/findAnimes/:id", controllers.FindAnimeEndPoint)
-	r.GET("/executeCrawlerEndpoint", controllers.ExecuteCrawlerEndpoint)
-	r.POST("/createAnime", controllers.CreateAnimeEndPoint)
+	r.PUT("/animes/:id", controllers.UpdateAnimeEndpoint)
+	r.DELETE("/animes/:id", controllers.DeleteAnimeEndpoint)
+	r.GET("/animes/:id", controllers.FindAnimeEndPoint)
+	r.GET("/crawler", controllers.ExecuteCrawlerEndpoint)
+	r.POST("/animes", controllers.CreateAnimeEndPoint)
 }

@@ -1,15 +1,16 @@
 package repository
 
 import (
+	"errors"
 	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 var (
-	err   error
 	db    *gorm.DB
 	count int
+	err   error
 )
 
 func NewDb(database *gorm.DB) {
@@ -59,22 +60,22 @@ func (d AnimeDocument) CreateAnime() uint64 {
 	return d.ID
 }
 
-func (d AnimeDocument) UpdateAnime(ID uint64) AnimeDocument {
-	if animeOld := d.GetAnimeById(ID); &animeOld != nil {
-		return animeOld
+func (d AnimeDocument) UpdateAnime(ID uint64) error {
+	if animeOld := d.GetAnimeById(ID); &animeOld == nil {
+		return errors.New("Não foi possivel encontrar o anime")
 	}
 	db.Save(&d)
-	return d
+	return err
 }
 
-func (d AnimeDocument) DeleteAnime(ID uint64) AnimeDocument {
-	animeDeletar := d.GetAnimeById(ID)
-	if &animeDeletar == nil {
-		return animeDeletar
+func (d AnimeDocument) DeleteAnime(ID uint64) error {
+	var animeDeletar = AnimeDocument{}
+	if animeDeletar = d.GetAnimeById(ID); &animeDeletar == nil {
+		return errors.New("Não existe o anime selecionado")
 	}
+	db.Delete(animeDeletar)
+	return err
 
-	db.Delete(&animeDeletar)
-	return animeDeletar
 }
 
 func Count() int {

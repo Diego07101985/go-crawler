@@ -31,6 +31,25 @@ func ExecuteCrawlerEndpoint(c *gin.Context) {
 	}
 }
 
+func UpdateAnimeEndpoint(c *gin.Context) {
+	var animeFound = repository.AnimeDocument{}
+	id := c.Param("id")
+	uid, err := strconv.ParseUint(id, 10, 64)
+
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
+	}
+
+	if err := animeFound.UpdateAnime(uid); err != nil {
+		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
+	}
+
+	c.JSON(200, animeFound)
+}
+
+func DeleteAnimeEndpoint(c *gin.Context) {
+
+}
 func CreateDocumentsEndpoint(c *gin.Context) {
 	var doc models.AnimeDocumentRequest
 
@@ -61,7 +80,6 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 }
 
 func FindAnimeEndPoint(c *gin.Context) {
-	fmt.Println("FindAnimeEndPoint")
 	var animeFound = repository.AnimeDocument{}
 
 	id := c.Param("id")
