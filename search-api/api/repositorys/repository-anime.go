@@ -59,6 +59,21 @@ func DeleteAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.Delet
 	return deleteResponse, err
 }
 
+func UpdateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.UpdateResponse, error) {
+	fmt.Println("UpdateAnimeDocument")
+	bulk := elasticClient.Update().
+		Index(elasticIndexName).
+		Type(elasticTypeName)
+
+	id := strconv.FormatUint(animeDocument.ID, 16)
+
+	update, err := bulk.Id(id).
+		Upsert(animeDocument).
+		Do(context.Request.Context())
+
+	return update, err
+}
+
 // CreateAnimeDocument is a representation of func createAnime
 func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkResponse, error) {
 	fmt.Println("CreateAnimeDocument")
