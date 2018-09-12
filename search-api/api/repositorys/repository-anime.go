@@ -49,12 +49,13 @@ func NewElastic(erro error, elastic *elastic.Client) {
 }
 
 func DeleteAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.DeleteResponse, error) {
-	fmt.Println("CreateAnimeDocument")
+	fmt.Println("DeleteAnimeDocument")
 	bulk := elasticClient.Delete().
 		Index(elasticIndexName).
 		Type(elasticTypeName)
 
 	id := strconv.FormatUint(animeDocument.ID, 16)
+	fmt.Println(id)
 	deleteResponse, err := bulk.Id(id).Do(context.Request.Context())
 	return deleteResponse, err
 }
