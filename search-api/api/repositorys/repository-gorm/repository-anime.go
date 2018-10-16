@@ -64,6 +64,11 @@ func (d AnimeDocument) UpdateAnime(ID uint64) error {
 	if animeOld := d.GetAnimeById(ID); &animeOld == nil {
 		return errors.New("Não foi possivel encontrar o anime")
 	}
+	newTimeString, err := time.Parse(time.RFC3339, d.CreatedAt.String())
+	d.CreatedAt = newTimeString
+	print(err)
+
+	d.Updated = time.Now().String()
 	db.Save(&d)
 	return err
 }

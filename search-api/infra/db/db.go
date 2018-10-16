@@ -46,7 +46,7 @@ func Init() {
 		err := db.CreateTable(&repository.AnimeDocument{})
 		if err != nil {
 			log.Println("Table already exists")
-			db.DropTable(&repository.AnimeDocument{})
+			//db.DropTable(&repository.AnimeDocument{})
 		}
 	}
 	db.AutoMigrate(&repository.AnimeDocument{})
