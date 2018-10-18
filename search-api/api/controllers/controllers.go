@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"go-crawler/search-api/api/models"
 	"go-crawler/search-api/api/repositorys"
-	"go-crawler/search-api/api/repositorys/repository-gorm"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
+	"go-crawler/search-api/services/crawler"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,20 +17,64 @@ import (
 )
 
 var (
-	page             *models.PageSearch
+	page             *elasticrepo.PageSearch
 	err              error
-	newDocumentAnime models.AnimeDocument
+	newDocumentAnime repository.AnimeDocument
+	anime            repository.AnimeDocument = repository.AnimeDocument{}
+	doc              models.AnimeDocumentRequest
 )
 
+func ExecuteCrawlerEndpoint(c *gin.Context) {
+	animesPersist := crawler.ConsumeAnimes(100)
+	if animesPersist > 0 {
+		c.JSON(http.StatusCreated, animesPersist)
+	}
+}
+
+func UpdateAnimeEndpoint(c *gin.Context) {
+	var animeFound = repository.AnimeDocument{}
+	id := c.Param("id")
+	uid, err := strconv.ParseUint(id, 10, 64)
+	animeFound.ID = uid
+
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
+	}
+	if err := animeFound.UpdateAnime(uid); err != nil {
+		errorResponse(c, http.StatusNoContent, err.Error())
+	}
+	c.JSON(200, animeFound)
+}
+
+func DeleteAnimeEndpoint(c *gin.Context) {
+	var animeDelete = repository.AnimeDocument{}
+	id := c.Param("id")
+	uid, err := strconv.ParseUint(id, 10, 64)
+	animeDelete.ID = uid
+
+	if err != nil {
+		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
+	}
+	if err := animeDelete.DeleteAnime(uid); err != nil {
+		errorResponse(c, http.StatusNoContent, err.Error())
+	}
+	if _, err := elasticrepo.DeleteAnimeDocument(animeDelete); err != nil {
+		errorResponse(c, http.StatusInternalServerError, "Não foi possivel deletar anime no elasticsearch")
+	}
+	c.JSON(200, http.StatusOK)
+}
 func CreateDocumentsEndpoint(c *gin.Context) {
 	var doc models.AnimeDocumentRequest
+
 	if err := c.BindJSON(&doc); err != nil {
 		errorResponse(c, http.StatusBadRequest, "Malformed request body")
 		return
 	}
 
 	if intID, err := strconv.ParseUint(shortid.MustGenerate(), 10, 64); err != nil {
-		newDocumentAnime = models.AnimeDocument{
+		var doc models.AnimeDocumentRequest
+
+		newDocumentAnime = repository.AnimeDocument{
 			ID:        intID,
 			Title:     doc.Title,
 			CreatedAt: time.Now().UTC(),
@@ -39,34 +84,32 @@ func CreateDocumentsEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
 
-	bulk := elasticrepo.CreateAnimeDocument(newDocumentAnime)
-	if _, err := elasticrepo.Execute(c, bulk); err != nil {
-		log.Println(err)
-		errorResponse(c, http.StatusInternalServerError, "Failed to create documents")
+	if _, err := elasticrepo.CreateAnimeDocument(newDocumentAnime); err != nil {
+		errorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 	c.Status(http.StatusOK)
 }
 
 func FindAnimeEndPoint(c *gin.Context) {
+	var animeFound = repository.AnimeDocument{}
+
 	id := c.Param("id")
-	println(id)
-	var anime models.AnimeDocument
 	uid, err := strconv.ParseUint(id, 10, 64)
-	println(id)
-	if err == nil {
+	fmt.Println(uid)
+	if err != nil {
 		errorResponse(c, http.StatusBadRequest, "Id esta no formato incorreto")
 	}
-	if anime = ormsql.GetAnimeById(uid); &anime != nil {
+
+	if animeFound = anime.GetAnimeById(uid); animeFound.Title == "" {
 		errorResponse(c, http.StatusNoContent, "Anime nao encontrado")
 	}
-	c.JSON(200, &anime)
+	c.JSON(200, &animeFound)
 }
 
 func CreateAnimeEndPoint(c *gin.Context) {
-	var anime models.AnimeDocument
 	if err := c.BindJSON(&anime); err != nil {
-		errorResponse(c, http.StatusBadRequest, "Malformed request body")
+		errorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -74,7 +117,7 @@ func CreateAnimeEndPoint(c *gin.Context) {
 		errorResponse(c, http.StatusConflict, "O anime ja existe")
 	}
 
-	id := ormsql.CreateAnime(anime)
+	id := anime.CreateAnime()
 	c.JSON(http.StatusCreated, id)
 }
 
@@ -84,7 +127,7 @@ func SearchEndpoint(c *gin.Context) {
 		errorResponse(c, http.StatusBadRequest, "Query not specified")
 		return
 	}
-	page := models.PageSearch{Skip: 0, Take: 10}
+	page := elasticrepo.PageSearch{Skip: 0, Take: 10}
 
 	if i, err := strconv.Atoi(c.Query("skip")); err == nil {
 		page.Skip = i

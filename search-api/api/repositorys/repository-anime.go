@@ -1,7 +1,8 @@
 package elasticrepo
 
 import (
-	"go-crawler/search-api/api/models"
+	"fmt"
+	repository "go-crawler/search-api/api/repositorys/repository-gorm"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -20,11 +21,16 @@ var (
 	context       *gin.Context
 )
 
+type PageSearch struct {
+	Skip int
+	Take int
+}
+
 func SetGinContext(c *gin.Context) {
 	context = c
 }
 
-func SearchDocument(query string, page *models.PageSearch) (*elastic.SearchResult, error) {
+func SearchDocument(query string, page *PageSearch) (*elastic.SearchResult, error) {
 	esQuery := elastic.NewMultiMatchQuery(query, "title", "content").
 		Fuzziness("2").
 		MinimumShouldMatch("2")
@@ -42,20 +48,42 @@ func NewElastic(erro error, elastic *elastic.Client) {
 	err, elasticClient = erro, elastic
 }
 
+func DeleteAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.DeleteResponse, error) {
+	fmt.Println("DeleteAnimeDocument")
+	bulk := elasticClient.Delete().
+		Index(elasticIndexName).
+		Type(elasticTypeName)
+
+	id := strconv.FormatUint(animeDocument.ID, 16)
+	fmt.Println(id)
+	deleteResponse, err := bulk.Id(id).Do(context.Request.Context())
+	return deleteResponse, err
+}
+
+func UpdateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.UpdateResponse, error) {
+	fmt.Println("UpdateAnimeDocument")
+	bulk := elasticClient.Update().
+		Index(elasticIndexName).
+		Type(elasticTypeName)
+
+	id := strconv.FormatUint(animeDocument.ID, 16)
+
+	update, err := bulk.Id(id).
+		Upsert(animeDocument).
+		Do(context.Request.Context())
+
+	return update, err
+}
+
 // CreateAnimeDocument is a representation of func createAnime
-func CreateAnimeDocument(animeDocument models.AnimeDocument) *elastic.BulkService {
+func CreateAnimeDocument(animeDocument repository.AnimeDocument) (*elastic.BulkResponse, error) {
+	fmt.Println("CreateAnimeDocument")
 	bulk := elasticClient.
 		Bulk().
 		Index(elasticIndexName).
 		Type(elasticTypeName)
 
-	id := strconv.FormatUint(animeDocument.ID, 64)
-
-	bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument))
-	return bulk
-}
-
-func Execute(context *gin.Context, b *elastic.BulkService) (*elastic.BulkResponse, error) {
-	bulkresponse, err := b.Do(context.Request.Context())
+	id := strconv.FormatUint(animeDocument.ID, 16)
+	bulkresponse, err := bulk.Add(elastic.NewBulkIndexRequest().Id(id).Doc(animeDocument)).Do(context.Request.Context())
 	return bulkresponse, err
 }

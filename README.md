@@ -1,2 +1,4 @@
-# How to Build a Search Service with Go and Elasticsearch
+#Commands
 docker-compose up -d --build
+docker-compose ps
+docker-compose exec container bash
