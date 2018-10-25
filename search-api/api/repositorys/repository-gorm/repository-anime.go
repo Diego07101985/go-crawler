@@ -3,7 +3,6 @@ package repository
 import (
 	"errors"
 	"time"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -28,24 +27,25 @@ type AnimeDocument struct {
 	TitleJapanese string    `json:"title_japanese"`
 	Aired         string    `json:"aired"`
 	Airing        string    `json:"airing"`
-	Background    string    `json:"background"`
+	Background    string    `gorm:"type:text" json:"background"`
 	Broadcast     string    `json:"broadcast"`
 	Duration      string    `json:"duration"`
-	Rank          string    `json:"rank"`
-	Episodes      string    `json:"episodes"`
-	Favorites     string    `json:"favorites"`
+	Rank          uint64    `json:"rank"`
+	Episodes      uint64    `json:"episodes"`
+	Favorites     uint64    `json:"favorites"`
 	Image         string    `json:"image_url"`
-	Members       string    `json:"members"`
-	Popularity    string    `json:"popularity"`
-	Rating        string    `json:"rating"`
-	Score         string    `json:"score"`
-	Source        string    `json:"source"`
+	Members       uint64    `json:"members"`
+	Popularity    uint64    `json:"popularity"`
+	Rating        uint64    `json:"rating"`
+	Score         uint64    `json:"score"`
+	Source        string   `json:"source"`
 	Status        string    `json:"status"`
-	ScoredBy      string    `json:"scored_by"`
-	Synopsis      string    `json:"synopsis"`
+	ScoredBy      uint64    `json:"scored_by"`
+	Synopsis      string    `gorm:"type:text" json:"synopsis"`
 	Type          string    `json:"type"`
 	Openings      string    `json:"opening_theme"`
 	Endings       string    `json:"ending_theme"`
+	Trailer       string    `json:"trailer_url"`
 }
 
 func (d AnimeDocument) GetAnimeById(ID uint64) AnimeDocument {
