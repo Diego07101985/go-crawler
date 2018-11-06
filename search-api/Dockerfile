@@ -11,6 +11,7 @@ RUN go get  github.com/teris-io/shortid
 RUN go get  github.com/jessevdk/go-assets
 RUN go get github.com/jinzhu/inflection
 RUN go get github.com/lib/pq
+RUN go get github.com/stretchr/testify/assert
 
 WORKDIR  $SRC_DIR
 RUN go build -o main
