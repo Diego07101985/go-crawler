@@ -1,9 +1,9 @@
-#GO CRAWLER ANIMES
+# GO CRAWLER ANIMES
 
 Uma aplicacao que visa  buscar informacoes de animes em diversos sites de maneira  dinamica e Performatica.
 
 
-#Endpoints
+# Endpoints
 
   POST
   - /animes/elastic
@@ -26,7 +26,7 @@ Uma aplicacao que visa  buscar informacoes de animes em diversos sites de maneir
   POST
   - /animes/
 
-#Commands
+# Commands
 docker-compose up -d --build
 docker-compose ps
 docker-compose exec container bash
