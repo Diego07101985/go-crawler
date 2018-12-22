@@ -5,26 +5,26 @@ Uma aplicacao que visa  buscar informacoes de animes em diversos sites de maneir
 
 # Endpoints
 
-  POST
-  - /animes/elastic
+ ## POST
+  ```  - /animes/elastic ```
 
-  GET
-  - /search/
+ ## GET
+ ``` - /search/ ```
 
 	
-  PUT
-  - /animes/:id
-  -  DELETE
-  - /animes/:id
+ ## PUT
+ ``` - /animes/:id ```
+ ## DELETE
+ ``` - /animes/:id ```
 
-  GET
-  - /animes/:id
+ ## GET
+ ``` - /animes/:id  ```
 
-  GET
-  - /crawler/
+ ## GET
+  ``` - /crawler/ ```
 
-  POST
-  - /animes/
+ ## POST
+ ``` - /animes/  ```
 
 # Commands
 docker-compose up -d --build
