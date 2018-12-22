@@ -2,7 +2,7 @@ version: '3.5'
 services:
   search_api:
     container_name: 'search_api'
-    build: ./search-api
+    build: ./search-api 
     restart: 'on-failure'
     depends_on:
       - mysql
