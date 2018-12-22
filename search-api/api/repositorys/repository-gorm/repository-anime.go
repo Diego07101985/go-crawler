@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"time"
+
 	"github.com/jinzhu/gorm"
 )
 
@@ -38,7 +39,7 @@ type AnimeDocument struct {
 	Popularity    uint64    `json:"popularity"`
 	Rating        uint64    `json:"rating"`
 	Score         uint64    `json:"score"`
-	Source        string   `json:"source"`
+	Source        string    `json:"source"`
 	Status        string    `json:"status"`
 	ScoredBy      uint64    `json:"scored_by"`
 	Synopsis      string    `gorm:"type:text" json:"synopsis"`

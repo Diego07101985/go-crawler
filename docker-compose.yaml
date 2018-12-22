@@ -4,7 +4,6 @@ services:
     container_name: 'search_api'
     build: ./search-api 
     restart: 'on-failure'
-    command: go test -v ./...
     depends_on:
       - mysql
       - elasticsearch
